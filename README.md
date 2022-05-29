@@ -1,6 +1,8 @@
 # P2_Probstat_B_5025201093
 Praktikum 2 Probabilitas dan Statistik 27-29 Mei 2022
 
+Hafizh Mufid Darussalam - 5025201093
+
 # Nomor 1
 Seorang peneliti melakukan penelitian mengenai pengaruh aktivitas 𝐴 terhadap
 kadar saturasi oksigen pada manusia. Peneliti tersebut mengambil sampel
@@ -127,7 +129,7 @@ Dari 2a, z = 8.97:
 P(Z > 8.97) = 1 - P(Z < 8.97) = 1 - 1 = 0
 
 Kesimpulannya, mobil dikendarai lebih dari 20000 kilometer per tahun. Sehingga, H0 ditolak dan H1 diterima.
-# 3
+# Nomor 3
 Diketahui perusahaan memiliki seorang data analyst ingin memecahkan
 permasalahan pengambilan keputusan dalam perusahaan tersebut. Selanjutnya
 didapatkanlah data berikut dari perusahaan saham tersebut.
@@ -231,4 +233,155 @@ grup3 <- subset(dataset_kucing, Group == "kucing putih")
 
 Hasil:
 
-![image](https://user-images.githubusercontent.com/79137636/170882350-f3e29977-55c4-4bd8-a7d8-7d5a48841117.png)
+![image](https://user-images.githubusercontent.com/79137636/170882441-c3532994-9c7d-4f3b-a14a-5814206d04ae.png)
+
+## b
+carilah atau periksalah Homogeneity of variances nya , Berapa nilai p yang
+didapatkan? , Apa hipotesis dan kesimpulan yang dapat diambil ?
+
+```
+
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170882476-6c67e398-20f5-4160-9f73-f752ad7b51ba.png)
+
+Nilai p yang diperoleh adalah 0.8054.
+
+## c
+Untuk uji ANOVA (satu arah), buatlah model linier dengan Panjang versus
+Grup dan beri nama model tersebut model 1.
+
+```
+qqnorm(grup1$Length, main = "model 1")
+qqline(grup1$Length)
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170882703-48ef8acf-2b87-4351-81a2-8a3f9b308d0f.png)
+
+## d
+Dari Hasil Poin C, Berapakah nilai-p ? , Apa yang dapat Anda simpulkan
+dari H0?
+
+## e
+Verifikasilah jawaban model 1 dengan Post-hoc test Tukey HSD, dari nilai p
+yang didapatkan apakah satu jenis kucing lebih panjang dari yang lain? Jelaskan.
+
+```
+model1 <- lm(Length~Group, data = dataset_kucing)
+anova(model1)
+TukeyHSD(aov(model1))
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170882922-7e2b6ad0-438e-4dd3-8b87-342aff2b3761.png)
+
+## f
+Visualisasikan data dengan ggplot2
+
+```
+library(ggplot2)
+ggplot(dataset_kucing, aes(x = Group, y = Length)) + geom_boxplot(fill = "grey80", colour = "black") + scale_x_discrete() + xlab("Treatment Group") + ylab("Length (cm)")
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170883099-8a603dc0-4ec8-4177-8ded-b40f117c1587.png)
+
+
+# Nomor 5
+Data yang digunakan merupakan hasil eksperimen yang dilakukan untuk
+mengetahui pengaruh suhu operasi (100˚C, 125˚C dan 150˚C) dan tiga jenis kaca
+pelat muka (A, B dan C) pada keluaran cahaya tabung osiloskop. Percobaan
+dilakukan sebanyak 27 kali dan didapat data sebagai berikut: [Data Hasil
+Eksperimen](https://drive.google.com/file/d/1aLUOdw_LVJq6VQrQEkuQhZ8FW43FemTJ/view). 
+
+![image](https://user-images.githubusercontent.com/79137636/170883855-696f4b92-34b1-4fb8-b2c8-b769db2ada37.png)
+
+Dengan data tersebut:
+## a
+Buatlah plot sederhana untuk visualisasi data
+
+```
+install.packages("multcompView")
+library(readr)
+library(ggplot2)
+library(multcompView)
+library(dplyr)
+GTL <- read_csv("GTL.csv")
+head(GTL)
+str(GTL)
+qplot(x = Temp, y = Light, geom = "point", data = GTL) +
+  facet_grid(.~Glass, labeller = label_both)
+```
+
+Sebelumnya, unduh terlebih dahulu file GTL.csv melalui link di nomor 5. Kemudian, pindahkan file ke working directory dari R Studio.
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170883446-eb633632-6d87-48ad-86a7-75919764f28b.png)
+
+## b
+Lakukan uji ANOVA dua arah
+
+```
+GTL$Glass <- as.factor(GTL$Glass)
+GTL$Temp_Factor <- as.factor(GTL$Temp)
+str(GTL)
+anova <- aov(Light ~ Glass*Temp_Factor, data = GTL)
+summary(anova)
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170883509-ff077737-1836-4562-a94f-3a8c9d557215.png)
+
+## c
+Tampilkan tabel dengan mean dan standar deviasi keluaran cahaya untuk
+setiap perlakuan (kombinasi kaca pelat muka dan suhu operasi)
+
+```
+data_summary <- group_by(GTL, Glass, Temp) %>%
+  summarise(mean=mean(Light), sd=sd(Light)) %>%
+  arrange(desc(mean))
+print(data_summary)
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170883627-577eaab2-a092-43d4-aa97-fcc3edea2a0d.png)
+
+## d
+Lakukan uji Tukey
+
+```
+tukey <- TukeyHSD(anova)
+print(tukey)
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170883676-b659bb49-40bb-4eb3-94ee-73c1f5526f29.png)
+
+## e
+Gunakan compact letter display untuk menunjukkan perbedaan signifikan
+antara uji Anova dan uji Tukey
+
+```
+tukey.cld <- multcompLetters4(anova, tukey)
+print(tukey.cld)
+cld <- as.data.frame.list(tukey.cld$`Glass:Temp_Factor`)
+data_summary$Tukey <- cld$Letters
+print(data_summary)
+write.csv("GTL_summary.csv")
+```
+
+Hasil:
+
+![image](https://user-images.githubusercontent.com/79137636/170883773-589de080-690e-4c8d-b152-e57ad51e5813.png)
+
+![image](https://user-images.githubusercontent.com/79137636/170883790-7a7fd8c5-b820-4417-aacc-fc01ba77307e.png)
